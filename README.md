@@ -1,1 +1,1 @@
-# University-Management-Information-
+# University-Management-Informatio-
