@@ -1,0 +1,9 @@
+<?php
+declare(strict_types=1);
+require __DIR__.'/../includes/bootstrap.php';require_role('admin');$page_title='Institution Reports - SMIS';
+$stats=['Students'=>(int)db_value('SELECT COUNT(*) FROM students'),'Lecturers'=>(int)db_value('SELECT COUNT(*) FROM lecturers'),'Finance Officers'=>(int)db_value('SELECT COUNT(*) FROM finance_officers'),'Classes'=>(int)db_value('SELECT COUNT(*) FROM classes'),'Modules'=>(int)db_value('SELECT COUNT(*) FROM modules'),'Attendance Records'=>(int)db_value('SELECT COUNT(*) FROM attendance'),'Grades'=>(int)db_value('SELECT COUNT(*) FROM grades'),'Final Clearances'=>(int)db_value('SELECT COUNT(*) FROM final_clearance WHERE status="approved"')];
+$performance=db_all('SELECT m.code,m.title,COUNT(g.id) graded,ROUND(AVG(g.final_grade),1) average,MAX(g.final_grade) highest,MIN(g.final_grade) lowest FROM modules m LEFT JOIN grades g ON g.module_id=m.id GROUP BY m.id ORDER BY m.code');
+include __DIR__.'/../includes/header.php';?>
+<div class="page-header"><h1>Institution Reports</h1><p>System-wide academic and operational statistics.</p></div><div class="grid grid-col-4"><?php foreach($stats as $label=>$value):?><div class="stat-card"><div class="stat-card-value"><?=$value?></div><div class="stat-card-label"><?=e($label)?></div></div><?php endforeach?></div>
+<div class="card"><div class="card-header">Module performance</div><div class="card-body"><table class="table"><thead><tr><th>Module</th><th>Students graded</th><th>Average</th><th>Lowest</th><th>Highest</th></tr></thead><tbody><?php foreach($performance as $p):?><tr><td><strong><?=e($p['code'])?></strong> <?=e($p['title'])?></td><td><?=$p['graded']?></td><td><?=$p['average']??'-'?></td><td><?=$p['lowest']??'-'?></td><td><?=$p['highest']??'-'?></td></tr><?php endforeach?></tbody></table></div></div>
+<?php include __DIR__.'/../includes/footer.php';?>
